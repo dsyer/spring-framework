@@ -293,7 +293,7 @@ class ConfigurationClassEnhancer {
 		 * @throws Throwable as a catch-all for any exception that may be thrown when invoking the
 		 * super implementation of the proxied method i.e., the actual {@code @Bean} method
 		 */
-        @Nullable
+		@Nullable
 		@Override
 		public Object intercept(Object instance, Method method, Object[] args,
 				MethodProxy methodProxy) throws Throwable {
