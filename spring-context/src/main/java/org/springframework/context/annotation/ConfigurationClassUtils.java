@@ -51,12 +51,14 @@ abstract class ConfigurationClassUtils {
 
 	private static final String CONFIGURATION_CLASS_LITE = "lite";
 
+	private static final String CONFIGURATION_CLASS_NOT_LITE = Conventions
+			.getQualifiedAttributeName(ConfigurationClassPostProcessor.class, "notLite");
+
 	private static final String CONFIGURATION_CLASS_ATTRIBUTE =
 			Conventions.getQualifiedAttributeName(ConfigurationClassPostProcessor.class, "configurationClass");
 
 	private static final String ORDER_ATTRIBUTE =
 			Conventions.getQualifiedAttributeName(ConfigurationClassPostProcessor.class, "order");
-
 
 	private static final Log logger = LogFactory.getLog(ConfigurationClassUtils.class);
 
@@ -115,7 +117,9 @@ abstract class ConfigurationClassUtils {
 		if (isFullConfigurationCandidate(metadata)) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
-		else if (isLiteConfigurationCandidate(metadata)) {
+		else if (beanDef.getRole() != BeanDefinition.ROLE_INFRASTRUCTURE
+				&& beanDef.getAttribute(CONFIGURATION_CLASS_NOT_LITE) == null
+				&& isLiteConfigurationCandidate(metadata)) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}
 		else {

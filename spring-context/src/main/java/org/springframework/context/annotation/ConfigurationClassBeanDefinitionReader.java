@@ -44,6 +44,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.annotation.ConfigurationCondition.ConfigurationPhase;
+import org.springframework.core.Conventions;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
@@ -69,6 +70,10 @@ import org.springframework.util.StringUtils;
  * @see ConfigurationClassParser
  */
 class ConfigurationClassBeanDefinitionReader {
+
+	private static final String NOT_LITE_ATTRIBUTE = Conventions
+			.getQualifiedAttributeName(ConfigurationClassPostProcessor.class,
+					"notLite");
 
 	private static final Log logger = LogFactory.getLog(ConfigurationClassBeanDefinitionReader.class);
 
@@ -151,6 +156,9 @@ class ConfigurationClassBeanDefinitionReader {
 	private void registerBeanDefinitionForImportedConfigurationClass(ConfigurationClass configClass) {
 		AnnotationMetadata metadata = configClass.getMetadata();
 		AnnotatedGenericBeanDefinition configBeanDef = new AnnotatedGenericBeanDefinition(metadata);
+		if (metadata.hasMetaAnnotation(Configuration.class.getName())) {
+			configBeanDef.setAttribute(NOT_LITE_ATTRIBUTE, true);
+		}
 
 		ScopeMetadata scopeMetadata = scopeMetadataResolver.resolveScopeMetadata(configBeanDef);
 		configBeanDef.setScope(scopeMetadata.getScopeName());
@@ -271,6 +279,7 @@ class ConfigurationClassBeanDefinitionReader {
 			logger.trace(String.format("Registering bean definition for @Bean method %s.%s()",
 					configClass.getMetadata().getClassName(), beanName));
 		}
+		beanDefToRegister.setAttribute(NOT_LITE_ATTRIBUTE, true);
 		this.registry.registerBeanDefinition(beanName, beanDefToRegister);
 	}
 
